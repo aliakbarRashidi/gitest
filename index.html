@@ -1,0 +1,107 @@
+<html>
+    <head>
+    <style>
+        #viz {
+            width: 100%;
+            height: 700px;
+            border: 2px solid black;
+            font: 22pt arial;
+
+        }
+    </style>
+    <script src="https://cdn.rawgit.com/neo4j-contrib/neovis.js/v0.0.1/dist/neovis.js"></script>
+    <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+
+    <script>
+    var viz;
+
+    function draw() {
+
+        var config = {
+            container_id: "viz",
+            server_url: "bolt://192.168.1.102",
+            server_user: "neo4j",
+            server_password: "test",
+            arrows: true,
+            //hierarchical_layout: true,
+            //hierarchical_sort_method: "hubsize",
+
+            labels :{
+                "Person": {
+                     caption: "family",
+                     size: "pagerank",
+                     community: "community"
+
+                }
+            },
+
+            relationships: {
+               "ConnectsTo": {
+                    caption: false,
+                    thickness: "count"
+               }
+
+            },
+
+            //initial_cypher: "MATCH p=()-->() RETURN p limit 50"
+            initial_cypher: "MATCH (a)-[r1:ConnectsTo]-(b)-[r2:ConnectsTo]-(c) optional match (b)-[r3:ConnectsTo]-(d) return a,b,c,d,r1,r2,r3  limit 50" 
+        }
+
+        viz = new NeoVis.default(config);
+        viz.render();
+        viz.stabilize();
+        console.log(viz);
+    }
+
+    </script>
+    </head>
+    <body onload="draw()">
+       Cypher query: <textarea rows="4" cols=50 id="cypher"></textarea><br>
+       <input type="submit" value="Submit" id="reload">
+       <input type="submit" value="Stabilize" id="stabilize">
+       <input type="submit" value="Find Common Friends" id="findCommonFriendsBetween3Person">
+       <input type="submit" value="Find Common Friends Only" id="findCommonFriendsBetween3Person2">
+
+       <div id="viz"> 
+       </div>
+    </body>
+
+    <script>
+        $("#reload").click(function() {
+            var cypher = $("#cypher").val();
+            if (cypher.length > 3) {
+                viz.renderWithCypher(cypher);
+            } else {
+                console.log("reload");
+                viz.reload();
+            }
+        });
+
+        $("#stabilize").click(function() {
+            viz.stabilize();
+        });
+
+        $("#findCommonFriendsBetween3Person").click(function() {
+            if (cypher.length > 3) {
+                    viz.renderWithCypher(cypher);
+                } else {
+                    console.log("reload");
+                    viz.reload();
+                }
+        });
+
+         $("#findCommonFriendsBetween3Person2").click(function() {
+            if (cypher.length > 3) {
+                    viz.renderWithCypher(cypher);
+                } else {
+                    console.log("reload");
+                    viz.reload();
+                }
+        });
+   </script>
+
+</html>
